@@ -9,6 +9,7 @@ from ebaysdk.exception import ConnectionError
 from ebaysdk.finding import Connection
 import ebaysdk.shopping
 import os
+import re
 
 os.environ.setdefault("EBAY_YAML", "ebay.yaml")
 
@@ -18,12 +19,28 @@ psa_url = "https://www.psacard.com/cert/"
 headers={'User-Agent':user_agent,} 
 ssl._create_default_https_context = ssl._create_unverified_context
 
+from PIL import Image
+
+from pytesseract import image_to_string
+
+
+im = urllib.request.urlopen('https://i.ebayimg.com/00/s/MTYwMFgxMjAw/z/WgYAAOSwrpNdFVM7/$_57.JPG?set_id=8800005007')
 
 
 
+text = re.findall(r'[0-9]{8}',image_to_string(Image.open(im)))
+print(text)
 
 
-def get_image(id=173882531773):
+
+def get_cert_number(url):
+	im = urllib.request.urlopen(url)
+	text = re.findall(r'[0-9]{8}',image_to_string(Image.open(im)))
+	return text
+
+
+
+def get_image(id=333274691098):
 	connection = ebaysdk.shopping.Connection(version='799', appid='vincentc-pokemon-PRD-5f95f0a8e-eb74953b',config_file=os.environ.get('EBAY_YAML'))
 	response = connection.execute('GetSingleItem', {
 	                'ItemID': id
@@ -32,15 +49,18 @@ def get_image(id=173882531773):
 	result = response.dict()
 	print(result['Item']['PictureURL'][0])
 
+	return result['Item']['PictureURL'][0]
+
 
 
 get_image()
+
 
 def commence_search(card_list, setname, grade ):
     for card_name in card_list:
         try:
             api = Connection(appid='vincentc-pokemon-PRD-5f95f0a8e-eb74953b', config_file=None)
-            response = api.execute('findItemsByKeywords', {'keywords': 'mew ex play promo'})
+            response = api.execute('findItemsByKeywords', {'keywords': 'gold star psa 10'})
 
 
             assert(response.reply.ack == 'Success')
@@ -93,7 +113,7 @@ def lookup_psa(cert_number):
 
 
 
-print(lookup_psa(42024055))
+print(lookup_psa(27543232))
 
 
 
@@ -120,6 +140,3 @@ except ConnectionError as e:
 
     print(e)
     print(e.response.dict())
-
-
-
