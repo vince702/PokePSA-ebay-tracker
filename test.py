@@ -11,9 +11,8 @@ import ebaysdk.shopping
 import os
 import re
 
+
 os.environ.setdefault("EBAY_YAML", "ebay.yaml")
-
-
 user_agent = 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.7) Gecko/2009021910 Firefox/3.0.7'
 psa_url = "https://www.psacard.com/cert/"
 headers={'User-Agent':user_agent,} 
@@ -22,14 +21,15 @@ ssl._create_default_https_context = ssl._create_unverified_context
 from PIL import Image
 
 from pytesseract import image_to_string
+import pytesseract
+pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+
+#im = urllib.request.urlopen('https://i.ebayimg.com/00/s/MTYwMFgxMjAw/z/WgYAAOSwrpNdFVM7/$_57.JPG?set_id=8800005007')
 
 
-im = urllib.request.urlopen('https://i.ebayimg.com/00/s/MTYwMFgxMjAw/z/WgYAAOSwrpNdFVM7/$_57.JPG?set_id=8800005007')
 
-
-
-text = re.findall(r'[0-9]{8}',image_to_string(Image.open(im)))
-print(text)
+#text = re.findall(r'[0-9]{8}',image_to_string(Image.open(im)))
+#print(text)
 
 
 
@@ -56,11 +56,12 @@ def get_image(id=333274691098):
 get_image()
 
 
-def commence_search(card_list, setname, grade ):
+def commence_search(card_list, setname='', grade='' ):
     for card_name in card_list:
         try:
+            search_term = "pokemon  psa "+ grade + ' ' +  card_name + ' ' +  setname
             api = Connection(appid='vincentc-pokemon-PRD-5f95f0a8e-eb74953b', config_file=None)
-            response = api.execute('findItemsByKeywords', {'keywords': 'gold star psa 10'})
+            response = api.execute('findCompletedItems', {'keywords':search_term})
 
 
             assert(response.reply.ack == 'Success')
@@ -75,8 +76,9 @@ def commence_search(card_list, setname, grade ):
             assert(type(response.dict()) == dict)
             #print (len(k['searchResult']['item']))
 
-            print (search_results['searchResult']['item'][0]['itemId'])
-            print (search_results['searchResult']['item'][1]['itemId'])
+            #print (search_results['searchResult']['item'][0]['itemId'])
+            #print (search_results['searchResult']['item'][1]['itemId'])
+            return (search_results['searchResult']['item'])
 
         except ConnectionError as e:
 
@@ -87,7 +89,7 @@ def commence_search(card_list, setname, grade ):
 
     
 
-commence_search([1],"neo", 10)
+commence_search(["tyranitar"],"neo destiny", '10')
 
 def lookup_psa(cert_number):  
   try:
