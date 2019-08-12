@@ -22,7 +22,7 @@ from PIL import Image
 
 from pytesseract import image_to_string
 import pytesseract
-pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+#pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
 #im = urllib.request.urlopen('https://i.ebayimg.com/00/s/MTYwMFgxMjAw/z/WgYAAOSwrpNdFVM7/$_57.JPG?set_id=8800005007')
 
@@ -53,7 +53,6 @@ def get_image(id=333274691098):
 
 
 
-get_image()
 
 
 def commence_search(card_list, setname='', grade='' ):
@@ -78,7 +77,31 @@ def commence_search(card_list, setname='', grade='' ):
 
             #print (search_results['searchResult']['item'][0]['itemId'])
             #print (search_results['searchResult']['item'][1]['itemId'])
-            return (search_results['searchResult']['item'])
+            
+            item_list = [0] * len(search_results['searchResult']['item'])
+
+            index = 0
+            for listing in search_results['searchResult']['item'] :
+
+            	listing = {'id':listing['itemId'],
+            				'title':listing['title'],
+            				'currency':listing['sellingStatus']['convertedCurrentPrice']['_currencyId'],
+            				'price':listing['sellingStatus']['convertedCurrentPrice']['value'],
+            				'start':listing['listingInfo']['startTime'],
+            				'end':listing['listingInfo']['endTime'],
+            				'offerEnabled':listing['listingInfo']['bestOfferEnabled'],
+            				'buyItNowAvailable':listing['listingInfo']['buyItNowAvailable'],
+            				'state':listing['sellingStatus']['sellingState']}
+            	item_list[index] = listing
+            	index += 1
+            return item_list
+
+
+
+
+
+
+
 
         except ConnectionError as e:
 
@@ -89,7 +112,6 @@ def commence_search(card_list, setname='', grade='' ):
 
     
 
-commence_search(["tyranitar"],"neo destiny", '10')
 
 def lookup_psa(cert_number):  
   try:
@@ -112,33 +134,3 @@ def lookup_psa(cert_number):
     return "errror getting cert number"
 
 
-
-
-
-print(lookup_psa(27543232))
-
-
-
-try:
-    api = Connection(appid='vincentc-pokemon-PRD-5f95f0a8e-eb74953b', config_file=None)
-    response = api.execute('findItemsByKeywords', {'keywords': 'mew ex play promo'})
-
-
-    assert(response.reply.ack == 'Success')
-    assert(type(response.reply.timestamp) == datetime.datetime)
-    assert(type(response.reply.searchResult.item) == list)
-    item = response.reply.searchResult.item
-    k = response.dict()
-    
-    item = response.reply.searchResult.item[0]
-    assert(type(item.listingInfo.endTime) == datetime.datetime)
-    assert(type(response.dict()) == dict)
-    #print (len(k['searchResult']['item']))
-    #print (k['searchResult']['item'][0])
-
-
-
-except ConnectionError as e:
-
-    print(e)
-    print(e.response.dict())
