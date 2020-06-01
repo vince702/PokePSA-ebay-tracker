@@ -37,6 +37,8 @@ def click_expansion(driver, link, wait_until_exists):
         EC.presence_of_element_located((
         By.ID, wait_until_exists)))
 
+    # TODO wait 20 seconds max and skip if not - otherwise selenium TimeoutException
+
     # extraction logic
     return driver.find_element_by_id(wait_until_exists)
 
@@ -100,22 +102,14 @@ def get_definition(driver, link):
     
     def parse_name(wrapper): # TODO
         source = wrapper.get_attribute('innerHTML')
-        # text = wrapper.find_element_by_xpath("//strong").get_attribute('text')
-        # print(text)
-        # source = source.replace(text, '').get_attribute('innerHTML')
-
         res = []
         remove_tags = re.sub('<[^>]+>', '', source)
         split_elem = re.split("(\s+)", remove_tags)
         i = 0
         for elem in remove_tags.replace('Shop', '').split('\n'):
-            # print(remove_spaces(elem))
-            # print(remove_spaces(elem) == '')
             if remove_spaces(elem) != '':
                 res.append(elem)
-                # print(split_elem)
             i += 1
-        # print(res)
         return res
 
     details = []
@@ -149,7 +143,6 @@ for year in get_tcg_years(driver):
     cards = pokemon_cards_by_year(driver, year['link'])
     for card in cards:
         card_definition = get_definition(driver, card['link'])
-        # print(year['year'], card['series'], card_definition['head'], card_definition['sub'])
         for definition in card_definition:
             card = {
                 'year' : year['year'], 
@@ -159,12 +152,8 @@ for year in get_tcg_years(driver):
             }
             try:
                 card['sub'] = definition['sub']
-            except:
-                print('unlucky')
 
             res.append(card)
-            # print(json.dumps(card, indent=2))
-            # print('\n')
 
 print('result')
 print(res)
