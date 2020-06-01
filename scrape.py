@@ -41,13 +41,35 @@ def get_tcg_years(driver):
 
 # filter href links for set names with 'Pokemon' in it
 # https://www.psacard.com/pop/tcg-cards/1993/156957
-def pokemon_cards_by_year():
-    return 0
+def pokemon_cards_by_year(driver, link):
+    driver.get(link) # navigate to page
+
+    grid = driver.find_element_by_id('pop-grid')
+    table = grid.find_element_by_tag_name('tbody')
+    rows = table.find_elements_by_class_name('even') + table.find_elements_by_class_name('odd')
+
+    links = {}
+    ind = 0
+    for row in rows:
+        if 'totals' in row.get_attribute('class').split(): # remove label row
+            rows.pop(ind)
+        else:
+            elem = row.find_element_by_tag_name('a')
+            name = elem.get_attribute('innerHTML')
+            if 'Pokemon' in name:
+                link = elem.get_attribute('href')
+                links[name] = link
+
+    return links
 
 # get card_no, name, sub_name (ex. edition, holo, etc.)
 def card_definition(set):
     return 0
 
 driver = initDriver()
-print(get_tcg_years(driver))
+years = get_tcg_years(driver)
+for year, link in years.items():
+    cards = pokemon_cards_by_year(driver, link)
+    print(year, cards)
+
 driver.quit()
