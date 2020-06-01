@@ -1,4 +1,6 @@
 import os
+import copy
+
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
@@ -6,6 +8,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver import ActionChains
 
 import json # for testing
+
+data = []
 
 def initDriver():
     # get initial html
@@ -25,7 +29,7 @@ def get_tcg_years(driver):
     table = grid.find_element_by_tag_name('tbody')
     rows = table.find_elements_by_class_name('even') + table.find_elements_by_class_name('odd')
 
-    years = {}
+    years = []
     ind = 0
     for row in rows:
         if 'totals' in row.get_attribute('class').split(): # remove label row
@@ -34,7 +38,10 @@ def get_tcg_years(driver):
             year_elem = row.find_element_by_tag_name('a')
             year = year_elem.get_attribute('innerHTML')
             link = year_elem.get_attribute('href')
-            years[year] = link
+            years.append({
+                'year': year,
+                'link': link
+            })
         ind += 1
 
     return years
@@ -48,7 +55,7 @@ def pokemon_cards_by_year(driver, link):
     table = grid.find_element_by_tag_name('tbody')
     rows = table.find_elements_by_class_name('even') + table.find_elements_by_class_name('odd')
 
-    links = {}
+    links = []
     ind = 0
     for row in rows:
         if 'totals' in row.get_attribute('class').split(): # remove label row
@@ -58,18 +65,39 @@ def pokemon_cards_by_year(driver, link):
             name = elem.get_attribute('innerHTML')
             if 'Pokemon' in name:
                 link = elem.get_attribute('href')
-                links[name] = link
+                links.append({
+                    'name': name,
+                    'link': link
+                })
 
     return links
 
 # get card_no, name, sub_name (ex. edition, holo, etc.)
-def card_definition(set):
-    return 0
+def definition(driver, card):
+    driver.get(card) # navigate to page
+    return {
+        'head': 'asdf',
+        'sub': 'asdf'
+    }
 
 driver = initDriver()
-years = get_tcg_years(driver)
-for year, link in years.items():
-    cards = pokemon_cards_by_year(driver, link)
-    print(year, cards)
+res = []
+for year in get_tcg_years(driver):
+    cards = pokemon_cards_by_year(driver, year['link'])
+    for card in cards:
+        card_definition = definition(driver, card['link'])
+        print(year['year'], card['name'], card_definition['head'], card_definition['sub'])
+        card = {
+            'year' : year['year'], 
+            'card' : card['name'],
+            'name' : card_definition['head'],
+            'sub'  : card_definition['sub']
+        }
+        res.append(card)
+        print(json.dumps(card, indent=2))
+        print('\n')
+
+print('result')
+print(res)
 
 driver.quit()
