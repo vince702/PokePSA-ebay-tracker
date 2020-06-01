@@ -20,8 +20,24 @@ def initDriver():
 
 # base page
 # https://www.psacard.com/pop/tcg-cards/156940
-def get_tcg_years():
-    return 0
+def get_tcg_years(driver):
+    grid = driver.find_element_by_id('years-grid')
+    table = grid.find_element_by_tag_name('tbody')
+    rows = table.find_elements_by_class_name('even') + table.find_elements_by_class_name('odd')
+
+    years = {}
+    ind = 0
+    for row in rows:
+        if 'totals' in row.get_attribute('class').split(): # remove label row
+            rows.pop(ind)
+        else:
+            year_elem = row.find_element_by_tag_name('a')
+            year = year_elem.get_attribute('innerHTML')
+            link = year_elem.get_attribute('href')
+            years[year] = link
+        ind += 1
+
+    return years
 
 # filter href links for set names with 'Pokemon' in it
 # https://www.psacard.com/pop/tcg-cards/1993/156957
@@ -33,4 +49,5 @@ def card_definition(set):
     return 0
 
 driver = initDriver()
+print(get_tcg_years(driver))
 driver.quit()
