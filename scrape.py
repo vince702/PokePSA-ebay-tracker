@@ -152,10 +152,19 @@ for year in get_tcg_years(driver):
             }
             try:
                 card['sub'] = definition['sub']
+            except:
+                print('error')
 
             res.append(card)
 
 print('result')
 print(res)
+
+test_data = [{'card_no': '1', 'name': 'Bulbasaur', 'series': 'Pokemon Japanese Topsun', 'sub': 'BlueBack', 'year': '1995'}, {'card_no': '2', 'name': 'Ivysaur', 'series': 'Pokemon Japanese Topsun', 'sub': 'BlueBack', 'year': '1995'}, {'card_no': '3', 'name': 'Venusaur', 'series': 'Pokemon Japanese Topsun', 'sub': 'BlueBack', 'year': '1995'}, {'card_no': '3', 'name': 'Venusaur', 'series': 'Pokemon Japanese Topsun', 'sub': 'Holofoil', 'year': '1995'}, {'card_no': '4', 'name': 'Charmander', 'series': 'Pokemon Japanese Topsun', 'sub': 'GreenBack', 'year': '1995'}, {'card_no': '5', 'name': 'Charmeleon', 'series': 'Pokemon Japanese Topsun', 'sub': 'GreenBack', 'year': '1995'}, {'card_no': '6', 'name': 'Charizard', 'series': 'Pokemon Japanese Topsun', 'sub': 'BlueBack', 'year': '1995'}, {'card_no': '6', 'name': 'Charizard', 'series': 'Pokemon Japanese Topsun', 'sub': 'Holofoil', 'year': '1995'}, {'card_no': '7', 'name': 'Squirtle', 'series': 'Pokemon Japanese Topsun', 'sub': 'GreenBack', 'year': '1995'}, {'card_no': '8', 'name': 'Wartortle', 'series': 'Pokemon Japanese Topsun', 'sub': 'GreenBack', 'year': '1995'}, {'card_no': '9', 'name': 'Blastoise', 'series': 'Pokemon Japanese Topsun', 'sub': 'BlueBack', 'year': '1995'}, {'card_no': '9', 'name': 'Blastoise', 'series': 'Pokemon Japanese Topsun', 'sub': 'Holofoil', 'year': '1995'}, {'card_no': '10', 'name': 'Caterpie', 'series': 'Pokemon Japanese Topsun', 'sub': 'GreenBack', 'year': '1995'}, {'card_no': '11', 'name': 'Metapod', 'series': 'Pokemon Japanese Topsun', 'sub': 'GreenBack', 'year': '1995'}]
+import csv
+with open('cards.csv', 'w', newline='') as file:
+    for card in test_data:
+        writer = csv.writer(file)
+        writer.writerow([card['card_no'], card['series'], card['name'], card['sub'], card['year']])
 
 driver.quit()
