@@ -1,6 +1,7 @@
 import os
 import copy
 import re
+import csv
 
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -30,8 +31,8 @@ def initDriver():
     # chrome_options.add_argument("--headless")  
 
     driver = webdriver.Chrome(ChromeDriverManager().install(), options=chrome_options)
-    driver.get('https://order.mandarake.co.jp/order/listPage/list?upToMinutes=360&layout=2&sort=price&soldOut=1&categoryCode=0602&lang=en') # base webpage
-
+    # driver.get('https://order.mandarake.co.jp/order/listPage/list?upToMinutes=360&layout=2&sort=price&soldOut=1&categoryCode=0602&lang=en') # base webpage
+    driver.get('https://order.mandarake.co.jp/order/listPage/list?upToMinutes=720&layout=2&sort=price&soldOut=1&categoryCode=0602&lang=en')
     return driver
 
 def get_above_5000_yen(driver):
@@ -42,9 +43,39 @@ def get_above_5000_yen(driver):
         price = price.replace(' yen', '')
         price = price.replace(',', '')
         if float(price) > 5000:
-            to_check.append(card.find_element_by_class_name('title'))
+        # if float(price) > 1000:
+            to_check.append(remove_spaces(card.find_element_by_class_name('title').find_element_by_tag_name("a").get_attribute('innerHTML')))
     return to_check
+
+def remove_spaces(inp):
+    return "".join(inp.split())
+
+def read_from_csv():
+    out = []
+    f=open("saved.csv")
+    for row in csv.reader(f):
+        # print('row', row[0])
+        out.append(row[0])
+    return out
 
 driver = initDriver()
 search_cards = get_above_5000_yen(driver)
-print(search_cards)
+print('search cards', search_cards)
+
+content = read_from_csv()
+print('content', content)
+
+def diff(li1, li2): 
+    return (list(set(li1) - set(li2)))
+
+# print(diff(search_cards, content)) 
+the_list = diff(search_cards, content)
+print(the_list)
+
+if len(the_list) > 0:
+    print('notify user')
+
+with open('saved.csv', 'a') as file_handler:
+    for item in the_list:
+        print(item)
+        file_handler.write("{}\n".format(item))
