@@ -42,8 +42,8 @@ def get_above_5000_yen(driver):
         price = card.find_element_by_class_name("price").find_element_by_tag_name("p").get_attribute('innerHTML')
         price = price.replace(' yen', '')
         price = price.replace(',', '')
-        # if float(price) > 5000:
-        if float(price) > 1000:
+        if float(price) > 5000:
+        # if float(price) > 1000:
             to_check.append(remove_spaces(card.find_element_by_class_name('title').find_element_by_tag_name("a").get_attribute('innerHTML')))
     return to_check
 
@@ -60,10 +60,10 @@ def read_from_csv():
 
 driver = initDriver()
 search_cards = get_above_5000_yen(driver)
-print('search cards', search_cards)
+# print('search cards', search_cards)
 
 content = read_from_csv()
-print('content', content)
+# print('content', content)
 
 def diff(li1, li2): 
     return (list(set(li1) - set(li2)))
@@ -74,17 +74,17 @@ def notify(title, text):
     os.system("""
               osascript -e 'display notification "{}" with title "{}"'
               """.format(text, title))
-              
+
 # print(diff(search_cards, content)) 
 the_list = diff(search_cards, content)
-print(the_list)
+# print(the_list)
 
 if len(the_list) > 0:
-    print('notify user')
+    # print('notify user')
     notify("new card", the_list)
 
 
 with open('saved.csv', 'a') as file_handler:
     for item in the_list:
-        print(item)
+        # print(item)
         file_handler.write("{}\n".format(item))
