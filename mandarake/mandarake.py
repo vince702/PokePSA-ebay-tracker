@@ -13,6 +13,14 @@ from selenium.webdriver.support import expected_conditions as EC
 
 import json # for testing
 
+from twilio.rest import Client
+
+account_sid = 'AC6f69c5b77d2c47cf97f6453f9fe2a527'
+auth_token= '2b4d92522c32a9550af756b7a441f1d6'
+client = Client(account_sid, auth_token)
+#+12053862210
+
+
 class card:
     def __init__(self):
         self.name = name
@@ -42,7 +50,7 @@ def get_above_5000_yen(driver):
         price = card.find_element_by_class_name("price").find_element_by_tag_name("p").get_attribute('innerHTML')
         price = price.replace(' yen', '')
         price = price.replace(',', '')
-        if float(price) > 5000:
+        if float(price) > 300:
         # if float(price) > 1000:
             to_check.append(remove_spaces(card.find_element_by_class_name('title').find_element_by_tag_name("a").get_attribute('innerHTML')))
     return to_check
@@ -58,12 +66,7 @@ def read_from_csv():
         out.append(row[0])
     return out
 
-driver = initDriver()
-search_cards = get_above_5000_yen(driver)
-# print('search cards', search_cards)
 
-content = read_from_csv()
-# print('content', content)
 
 def diff(li1, li2): 
     return (list(set(li1) - set(li2)))
@@ -71,20 +74,49 @@ def diff(li1, li2):
 import os
 
 def notify(title, text):
+    '''
     os.system("""
               osascript -e 'display notification "{}" with title "{}"'
               """.format(text, title))
+    '''
 
-# print(diff(search_cards, content)) 
-the_list = diff(search_cards, content)
-# print(the_list)
+    client.messages.create(
+        to="MY_PHONE_NO",
+        from_="+12053862210",
+        body=text)
 
-if len(the_list) > 0:
-    # print('notify user')
-    notify("new card", the_list)
+import time
 
 
-with open('saved.csv', 'a') as file_handler:
-    for item in the_list:
-        # print(item)
-        file_handler.write("{}\n".format(item))
+driver = initDriver()
+
+while True:
+
+    driver.get('https://order.mandarake.co.jp/order/listPage/list?upToMinutes=720&layout=2&sort=price&soldOut=1&categoryCode=0602&lang=en')
+    search_cards = get_above_5000_yen(driver)
+    # print('search cards', search_cards)
+
+    content = read_from_csv()
+    # print('content', content)
+
+
+    # print(diff(search_cards, content)) 
+    the_list = diff(search_cards, content)
+
+    #print(the_list)
+
+
+    if len(the_list) > 0:
+        # print('notify user')
+        for i in range(0,len(the_list)):
+            notify("new card", the_list[i])
+
+
+    with open('saved.csv', 'a') as file_handler:
+        for item in the_list:
+            # print(item)
+
+            file_handler.write("{}\n".format(item))
+    time.sleep(60)
+
+
