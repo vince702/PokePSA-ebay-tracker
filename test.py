@@ -10,7 +10,8 @@ from ebaysdk.finding import Connection
 import ebaysdk.shopping
 import os
 import re
-
+import requests
+import cloudscraper
 
 os.environ.setdefault("EBAY_YAML", "ebay.yaml")
 user_agent = 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.7) Gecko/2009021910 Firefox/3.0.7'
@@ -22,12 +23,10 @@ from PIL import Image
 
 from pytesseract import image_to_string
 import pytesseract
+
+
 #pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
-
 #im = urllib.request.urlopen('https://i.ebayimg.com/00/s/MTYwMFgxMjAw/z/WgYAAOSwrpNdFVM7/$_57.JPG?set_id=8800005007')
-
-
-
 #text = re.findall(r'[0-9]{8}',image_to_string(Image.open(im)))
 #print(text)
 
@@ -114,12 +113,17 @@ def commence_search(card_list, setname='', grade='' ):
 
 
 def lookup_psa(cert_number):  
-  try:
+  
     url = psa_url + str(cert_number)
-    request=urllib.request.Request(url,None,headers)
-    response = urllib.request.urlopen(request)
-    data = response.read() # The data u need
-    soup = BeautifulSoup(data, 'html.parser')
+    print(url)
+
+    
+
+    scraper = cloudscraper.create_scraper()  
+    page = scraper.get(url).content  
+    soup = BeautifulSoup(page, 'lxml')
+    
+
 
     psa_card_dict = {}
     for name in soup.find_all("td", class_="cert-grid-title"):
@@ -128,9 +132,18 @@ def lookup_psa(cert_number):
         value = name.parent.find_all('td')[-1]
         value = value.get_text()
         psa_card_dict[str(label)] = value
+
+
     
     return psa_card_dict
-  except:
-    return "errror getting cert number"
+
+
+
+
+
+
+
+
+
 
 
