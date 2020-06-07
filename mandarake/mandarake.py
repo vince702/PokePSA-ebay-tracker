@@ -15,8 +15,8 @@ import json # for testing
 
 from twilio.rest import Client
 
-account_sid = 'AC6f69c5b77d2c47cf97f6453f9fe2a527'
-auth_token= '2b4d92522c32a9550af756b7a441f1d6'
+account_sid = 'ssid'
+auth_token= 'auth'
 client = Client(account_sid, auth_token)
 #+12053862210
 
