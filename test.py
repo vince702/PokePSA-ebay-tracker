@@ -54,10 +54,10 @@ def get_image(id=333274691098):
 
 
 
-def commence_search(card_list, setname='', grade='' ):
-    for card_name in card_list:
+def commence_search( query  ):
+    
         try:
-            search_term = "pokemon  psa "+ grade + ' ' +  card_name + ' ' +  setname
+            search_term = query
             api = Connection(appid='vincentc-pokemon-PRD-5f95f0a8e-eb74953b', config_file=None)
             response = api.execute('findCompletedItems', {'keywords':search_term})
 
@@ -104,10 +104,10 @@ def commence_search(card_list, setname='', grade='' ):
 
         except ConnectionError as e:
 
-            print(e)
-            print(e.response.dict())
+            print("NIGGER")
+            print("NIGGER")
 
-    pass
+
 
     
 
