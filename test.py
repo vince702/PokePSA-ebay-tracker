@@ -59,7 +59,7 @@ def commence_search( query  ):
         try:
             search_term = query
             api = Connection(appid='vincentc-pokemon-PRD-5f95f0a8e-eb74953b', config_file=None)
-            response = api.execute('findCompletedItems', {'keywords':search_term})
+            response = api.execute('findItemsByKeywords', {'keywords':search_term})
 
 
             assert(response.reply.ack == 'Success')
@@ -104,8 +104,36 @@ def commence_search( query  ):
 
         except ConnectionError as e:
 
-            print("NIGGER")
-            print("NIGGER")
+            print(e)
+            print(e.response.dict())
+
+
+
+
+#@param query a string to search ebay
+#@return psacards, an array with ebay listing info on all items and the cert number of the psa label in the listing image
+
+def get_psa_cards_from_search(query)
+    psa_cards = []
+
+    results = test.commence_search(query)
+
+    ids = []
+    for item in results:
+        ids.append(item['id'])
+        l = item
+        id_ = l['id']
+        try:
+            l['certNum'] = test.get_cert_number(test.get_image(id_))
+            if (len(l['certNum']) != 1):
+                continue
+            psacards.append(l)
+        except:
+                continue
+
+    print(psacards)
+    return psacards
+
 
 
 
